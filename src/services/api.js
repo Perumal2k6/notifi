@@ -52,16 +52,17 @@ export function mapUser(user) {
 
 export function mapSound(sound) {
   let url = sound.file_url || "";
+  const isCustom = sound.sound_type === "CUSTOM";
   if (url && url.startsWith("/")) {
-    if (API_BASE_URL.startsWith("http")) {
-      try {
-        const origin = new URL(API_BASE_URL).origin;
-        url = origin + url;
-      } catch (e) {
-        // Fallback
+    if (isCustom) {
+      if (API_BASE_URL.startsWith("http")) {
+        try {
+          const origin = new URL(API_BASE_URL).origin;
+          url = origin + url;
+        } catch (e) {}
+      } else {
+        url = window.location.origin + url;
       }
-    } else {
-      url = window.location.origin + url;
     }
   }
 

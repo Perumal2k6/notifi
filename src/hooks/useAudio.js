@@ -54,16 +54,7 @@ export default function useAudio(source, onError, options = {}) {
       const report = details => {
         if (reported) return
         reported = true
-        console.error('Audio playback error details:', { 
-          url: playUrl, 
-          errorType: details.type,
-          name: details.name,
-          message: details.message,
-          networkState: audio.networkState,
-          readyState: audio.readyState,
-          audioErrorCode: audio.error?.code,
-          audioErrorMessage: audio.error?.message
-        })
+        console.error(`[Audio] Error: ${details.type} - ${details.name} - ${details.message}`)
         
         if (isFallback || i === uniqueUrls.length - 1) {
           stop()
@@ -73,13 +64,16 @@ export default function useAudio(source, onError, options = {}) {
         }
       }
 
-      audio.oncanplaythrough = () => { console.debug('Audio loaded:', playUrl) }
+      audio.onload = () => console.log(`[Audio] Loading URL: ${playUrl}`)
+      audio.oncanplay = () => console.log(`[Audio] Loading URL: ${playUrl} (can play)`)
+      audio.oncanplaythrough = () => console.log(`[Audio] Loading URL: ${playUrl} (can play through)`)
       audio.onerror = () => report({ type: 'load', code: audio.error?.code, message: audio.error?.message })
       audio.onended = () => { 
         if (!options.loop) stop() 
       }
 
       try {
+        console.log(`[Audio] Playing: ${playUrl}`)
         await audio.play()
         setIsPlaying(true)
         if (options.timeout) {
